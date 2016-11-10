@@ -5,4 +5,4 @@ template<int N, template<char...> class Meta, char... P>
 struct take;
 
 template<int N, bool B, template<char...P> class Meta, char... P>
-struct discard;
+struct drop;
