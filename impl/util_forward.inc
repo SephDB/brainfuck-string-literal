@@ -13,7 +13,7 @@ struct drop;
 template<char C, char... P>
 struct find;
 
-template<int N, typename T, typename... Ts>
+template<int N, typename... Ts>
 struct get;
 
 template<char C, char... P>
@@ -24,7 +24,7 @@ struct split;
 
 template<int N, char C>
 constexpr auto find_nth() {
-  return -1;
+  return 0;
 }
 
 template<int N, char C, char A, char... P>
