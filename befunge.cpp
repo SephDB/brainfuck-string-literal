@@ -210,6 +210,14 @@ struct befunge_impl {
 };
 
 template<typename Pos, typename Mov>
+struct impl<'#',Pos,Mov> : instr_types::internal_move {
+  using next_pos = typename Mov::template next_pos<Pos>;
+  static void run() {
+    set_direction<next_pos,Mov>::run(); //skip next_pos
+  };
+};
+
+template<typename Pos, typename Mov>
 struct impl<'?',Pos,Mov> : instr_types::internal_move {
   static void run() {
     switch(std::rand()%4) {
