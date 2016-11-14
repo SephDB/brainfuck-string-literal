@@ -156,8 +156,8 @@ static_assert(check_bounds<position<2,3,'1','2','\n','3','4','5','\n','6','7','8
 namespace instr_types {
   struct op {};
   struct branch {};
-  struct internal_move {};
   struct set_movement {};
+  struct internal_move {};
 }
 
 template<char C,typename Position, typename Movement, typename Enable = void>
@@ -175,15 +175,16 @@ struct befudge_impl {
     run_impl(internal{});
   };
   
+  static void run_impl(instr_types::op) {
+    internal::op(s);
+	befudge_impl<typename Movement::template next_pos<Position>,Movement>::run();
+  };
+  
   static void run_impl(instr_types::set_movement) {
     using new_movement = typename internal::movement;
 	befudge_impl<typename new_movement::template next_pos<Position>,new_movement>::run();
   };
   
-  static void run_impl(instr_types::op) {
-    internal::op(s);
-	befudge_impl<typename Movement::template next_pos<Position>,Movement>::run();
-  };
 };
 
 template<typename Pos, typename Mov>
