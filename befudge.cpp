@@ -160,11 +160,8 @@ namespace instr_types {
   struct set_movement {};
 }
 
-
 template<char C,typename Position, typename Movement, typename Enable = void>
 struct impl;
-
-template<char... P> struct befudge;
 
 namespace {
   std::vector<char> s;
@@ -178,10 +175,35 @@ struct befudge_impl {
     run_impl(internal{});
   };
   
+  static void run_impl(instr_types::set_movement) {
+    using new_movement = typename internal::movement;
+	befudge_impl<typename new_movement::template next_pos<Position>,new_movement>::run();
+  };
+  
   static void run_impl(instr_types::op) {
     internal::op(s);
 	befudge_impl<typename Movement::template next_pos<Position>,Movement>::run();
   };
+};
+
+template<typename Pos, typename Mov>
+struct impl<'>',Pos,Mov> : instr_types::set_movement {
+  using movement = move::right;
+};
+
+template<typename Pos, typename Mov>
+struct impl<'<',Pos,Mov> : instr_types::set_movement {
+  using movement = move::left;
+};
+
+template<typename Pos, typename Mov>
+struct impl<'^',Pos,Mov> : instr_types::set_movement {
+  using movement = move::up;
+};
+
+template<typename Pos, typename Mov>
+struct impl<'v',Pos,Mov> : instr_types::set_movement {
+  using movement = move::down;
 };
 
 template<typename Pos, typename Mov>
@@ -325,5 +347,6 @@ constexpr auto operator"" _befudge()
 }
 
 int main() {
-"&:*.19+,"_befudge.run();
+R"foo(v
+>&:*.19+,)foo"_befudge.run();
 }
