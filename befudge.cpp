@@ -168,6 +168,12 @@ namespace {
 }
 
 template<typename Position, typename Movement>
+struct befudge_impl;
+
+template<typename Position, typename Movement>
+using set_direction = befudge_impl<typename Movement::template next_pos<Position>,Movement>;
+
+template<typename Position, typename Movement>
 struct befudge_impl {
   using internal = impl<Position::value,Position,Movement>;
   
@@ -177,22 +183,26 @@ struct befudge_impl {
   
   static void run_impl(instr_types::op) {
     internal::op(s);
-	befudge_impl<typename Movement::template next_pos<Position>,Movement>::run();
+	set_direction<Position,Movement>::run();
   };
   
   static void run_impl(instr_types::branch) {
     bool b = s.back() != 0;
 	s.pop_back();
 	if(b) {
-	  befudge_impl<typename internal::true_branch::template next_pos<Position>,typename internal::true_branch>::run();
+	  set_direction<Position,typename internal::true_branch>::run();
 	} else {
-	  befudge_impl<typename internal::false_branch::template next_pos<Position>,typename internal::false_branch>::run();
+	  set_direction<Position,typename internal::false_branch>::run();
 	}
-  }
+  };
   
   static void run_impl(instr_types::set_movement) {
     using new_movement = typename internal::movement;
-	befudge_impl<typename new_movement::template next_pos<Position>,new_movement>::run();
+	set_direction<Position,new_movement>::run();
+  };
+  
+  static void run_impl(instr_types::internal_move) {
+    internal::run();
   };
   
 };
