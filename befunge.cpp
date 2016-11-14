@@ -208,6 +208,11 @@ struct befunge_impl {
 };
 
 template<typename Pos, typename Mov>
+struct impl<'@',Pos,Mov> : instr_types::internal_move {
+  static void run() {}; //End program
+};
+
+template<typename Pos, typename Mov>
 struct impl<'|',Pos,Mov> : instr_types::branch {
   using true_branch = move::up;
   using false_branch = move::down;
@@ -381,5 +386,5 @@ constexpr auto operator"" _befunge()
 
 int main() {
 R"foo(v
->&:*.19+,)foo"_befunge.run();
+>&:*.19+,@)foo"_befunge.run();
 }
