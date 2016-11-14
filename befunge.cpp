@@ -1,4 +1,6 @@
 #include <cstdio>
+#include <random>
+#include <ctime>
 #include <vector>
 #include <utility>
 #include <algorithm>
@@ -208,6 +210,25 @@ struct befunge_impl {
 };
 
 template<typename Pos, typename Mov>
+struct impl<'?',Pos,Mov> : instr_types::internal_move {
+  static void run() {
+    switch(std::rand()%4) {
+	  case 0:
+	  set_direction<Pos,move::up>::run();
+	  break;
+	  case 1:
+	  set_direction<Pos,move::down>::run();
+	  break;
+	  case 2:
+	  set_direction<Pos,move::left>::run();
+	  break;
+	  case 3:
+	  set_direction<Pos,move::right>::run();
+	}
+  };
+};
+
+template<typename Pos, typename Mov>
 struct impl<'@',Pos,Mov> : instr_types::internal_move {
   static void run() {}; //End program
 };
@@ -385,6 +406,13 @@ constexpr auto operator"" _befunge()
 }
 
 int main() {
-R"foo(v
->&:*.19+,@)foo"_befunge.run();
+std::srand(std::time(0));
+R"foo(v>>>>>v
+ 12345
+ ^?^
+> ? ?^
+ v?v
+ 6789
+ >>>> v
+^    .<)foo"_befunge.run();
 }
