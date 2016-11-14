@@ -166,17 +166,20 @@ struct impl;
 
 template<char... P> struct befudge;
 
+namespace {
+  std::vector<char> s;
+}
+
 template<typename Position, typename Movement>
 struct befudge_impl {
   using internal = impl<Position::value,Position,Movement>;
-  using s = typename Position::template apply_program<befudge>;
   
   static void run() {
     run_impl(internal{});
   };
   
   static void run_impl(instr_types::op) {
-    internal::op(s::stack);
+    internal::op(s);
 	befudge_impl<typename Movement::template next_pos<Position>,Movement>::run();
   };
 };
@@ -308,13 +311,9 @@ struct impl<'~',Pos,Mov> : instr_types::op {
   };
 };
 
-namespace {
-  std::vector<char> s;
-}
 template<char... P>
 struct befudge
 {
-  constexpr static std::vector<char>& stack = s;
   using instructions = typename program<P...>::instr;
   void run() {befudge_impl<position<0,0,P...>,move::right>::run();};
 };
@@ -326,5 +325,5 @@ constexpr auto operator"" _befudge()
 }
 
 int main() {
-"90*."_befudge.run();
+"&:*.19+,"_befudge.run();
 }
