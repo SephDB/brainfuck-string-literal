@@ -210,6 +210,30 @@ struct befunge_impl {
 };
 
 template<typename Pos, typename Mov>
+struct impl<'"',Pos,Mov> : instr_types::internal_move {
+  template<char C, typename P, typename M>
+  struct string_internal {
+    static void run() {
+	  s.push_back(C);
+	  using next_pos = typename M::template next_pos<P>;
+	  string_internal<next_pos::value,next_pos,M>::run();
+	};
+  };
+  
+  template<typename P, typename M>
+  struct string_internal<'"',P,M> {
+    static void run() {
+	  set_direction<P,M>::run();
+    } 
+  };
+  
+  static void run() {
+    using next_pos = typename Mov::template next_pos<Pos>;
+    string_internal<next_pos::value,next_pos,Mov>::run();
+  };
+};
+
+template<typename Pos, typename Mov>
 struct impl<'#',Pos,Mov> : instr_types::internal_move {
   using next_pos = typename Mov::template next_pos<Pos>;
   static void run() {
@@ -404,7 +428,7 @@ template<char... P>
 struct befunge
 {
   using instructions = typename program<P...>::instr;
-  void run() {befunge_impl<position<0,0,P...>,move::right>::run();};
+  void run() {s.clear();befunge_impl<position<0,0,P...>,move::right>::run();};
 };
 
 template<typename CharT, CharT... C> 
@@ -415,6 +439,9 @@ constexpr auto operator"" _befunge()
 
 int main() {
 std::srand(std::time(0));
+R"foo( 025*"!dlrow ,olleH":v
+                  v:,_@
+                  >  ^)foo"_befunge.run();
 R"foo(v>>>>>v
  12345
  ^?^
