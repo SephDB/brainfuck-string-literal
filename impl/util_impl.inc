@@ -54,7 +54,7 @@ template<char C,char... P>
 };
 
 template<char C>
-struct find<C> {static constexpr int value = -1;};
+struct find<C> {static constexpr int value = 0;};
 
 template<char C, template<char...> class Meta, char... P>
 struct count_consecutive
