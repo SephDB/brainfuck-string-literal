@@ -101,7 +101,17 @@ template<char C>
 struct num_occurences<C> {static constexpr int value = 0;};
 
 template<char C, char H, char... T>
-  struct num_occurences<C,H,T...> {static constexpr int value = ((C==H)?1:0)+num_occurences<C,T...>::value;};
+struct num_occurences<C,H,T...> {static constexpr int value = ((C==H)?1:0)+num_occurences<C,T...>::value;};
+
+template<int Start, int Size, template<char...> class Meta, char...P>
+struct extract {
+  template<char...Elems>
+    struct impl {
+      using type = take_t<Size,Meta,Elems...>;
+    };
+    
+    using type = typename drop_t<Start+1,impl,P...>::type;
+};
 
 template<char Sep, template<char...> class Row, template<typename...>class Field,char... P>
 struct split {

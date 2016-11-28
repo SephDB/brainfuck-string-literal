@@ -48,6 +48,9 @@ using get_t = typename get<N,Ts...>::type;
 template<char C, char... P>
 constexpr int count = num_occurences<C,P...>::value;
 
+template<int Start, int Size, template<char...> class Meta, char...P>
+using extract_t = typename extract<Start,Size,Meta,P...>::type;
+
 /**
 * Splits a variadic list into a tuple of Meta<Split...>...
 */

@@ -44,7 +44,12 @@ struct bf_impl {
   
   template<int LoopStart, bool B>
   struct loop_extractor {
-    using type = void;
+    static constexpr int loop_size = drop_t<LoopStart+1,closing_paren_t,P...>::value;
+    
+    using front_types = types_take_t<LoopStart,bf_char<P>...>;
+	using loop_type = extract_t<LoopStart,loop_size,loop,P...>;
+	using back_types = typename drop_t<LoopStart+loop_size+2,bf_impl,P...>::type;
+    using type = types_concat_t<front_types,types<loop_type>,back_types>;
   };
   
   ///Case where there is no loop in the program
@@ -69,19 +74,9 @@ struct bf_impl {
 template<>
 struct bf_impl<>
 {
+  using type = types<>;
   static void run() {};
 };
-/*
-template<char... P>
-struct bf_impl<'[',P...>
-{
-  static constexpr int loop_size = closing_paren<P...>::value;
-  
-  static void run() {
-    while(*ptr) take_t<loop_size,bf_impl,P...>::run();
-    drop_t<loop_size+1,bf_impl,P...>::run();
-  }
-};*/
 
 template<char C>
 struct bf_char
@@ -93,7 +88,7 @@ template <>
 struct bf_char<'+'>
 {
   static void run() {
-    *ptr++;
+    ++*ptr;
   }
 };
 
@@ -101,7 +96,7 @@ template <>
 struct bf_char<'>'>
 {
   static void run() {
-    ptr++;
+    ++ptr;
   }
 };
 
@@ -109,7 +104,7 @@ template <>
 struct bf_char<'-'>
 {
   static void run() {
-    *ptr--;
+    --*ptr;
   }
 };
 
@@ -117,7 +112,7 @@ template <>
 struct bf_char<'<'>
 {
   static void run() {
-    ptr--;
+    --ptr;
   }
 };
 
