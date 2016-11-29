@@ -7,58 +7,53 @@
 
 #include "impl/util.h"
 #include "impl/impl.h"
+#include "type_tests.h"
 #include "types.h"
 
-//Global pointer set at the start of each execution, not thread-safe
-char* ptr;
-
-template<char... P>
+template<typename... P>
 struct bf_impl;
 
 template<char... Prog>
 struct bf
 {
-  
+  using type = types<bf_char<Prog>...>;
   void run()
   {
     std::array<char,30000> d;
 	d.fill(0);
 	ptr = d.data();
-    bf_impl<Prog...>::run();
+	type::template apply<bf_impl>::run();
   }
 };
 
-template<char... T>
+template<typename... P>
 struct loop
 {
   static void run() {
-    while(*ptr) bf_impl<T...>::run();
+    while(*ptr) bf_impl<P...>::run();
   };
 };
 
-template<char C>
-struct bf_char;
-
-template<char... P>
+template<typename... P>
 struct bf_impl {
   
   template<int LoopStart, bool B>
   struct loop_extractor {
-    static constexpr int loop_size = drop_t<LoopStart+1,closing_paren_t,P...>::value;
+    static constexpr int loop_size = types_drop_t<LoopStart+1,P...>::template apply<closing_paren_t>::value;
     
-    using front_types = types_take_t<LoopStart,bf_char<P>...>;
-	using loop_type = extract_t<LoopStart,loop_size,loop,P...>;
-	using back_types = typename drop_t<LoopStart+loop_size+2,bf_impl,P...>::type;
+    using front_types = types_take_t<LoopStart,P...>;
+	using loop_type = typename types_extract_t<LoopStart,loop_size,P...>::template apply<loop>;
+	using back_types = typename types_drop_t<LoopStart+loop_size+2,P...>::template apply<::bf_impl>::type;
     using type = types_concat_t<front_types,types<loop_type>,back_types>;
   };
   
   ///Case where there is no loop in the program
   template<int N>
   struct loop_extractor<N,true> {
-    using type = types<bf_char<P>...>;
+    using type = types<P...>;
   };
   
-  static constexpr int loop_start = find_v<'[',P...>;
+  static constexpr int loop_start = types_find_v<bf_char<'['>,P...>;
   using type = typename loop_extractor<loop_start,loop_start==sizeof...(P)>::type;
   
   template<typename... T>
@@ -76,60 +71,6 @@ struct bf_impl<>
 {
   using type = types<>;
   static void run() {};
-};
-
-template<char C>
-struct bf_char
-{
-  static void run() {}
-};
-
-template <>
-struct bf_char<'+'>
-{
-  static void run() {
-    ++*ptr;
-  }
-};
-
-template <>
-struct bf_char<'>'>
-{
-  static void run() {
-    ++ptr;
-  }
-};
-
-template <>
-struct bf_char<'-'>
-{
-  static void run() {
-    --*ptr;
-  }
-};
-
-template <>
-struct bf_char<'<'>
-{
-  static void run() {
-    --ptr;
-  }
-};
-
-template <>
-struct bf_char<'.'>
-{
-  static void run() {
-    std::putchar(*ptr);
-  }
-};
-
-template <>
-struct bf_impl<','>
-{
-  static void run() {
-    *ptr = std::getchar();
-  }
 };
 
 #endif
