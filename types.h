@@ -86,8 +86,11 @@ struct types_extract {
 template<int Start, int Size, typename...P>
 using types_extract_t = typename types_extract<Start,Size,P...>::type;
 
+template<typename T, typename... P>
+struct types_find;
+
 template<typename T, typename U, typename... P>
-struct types_find {
+struct types_find<T,U,P...> {
   static constexpr int value = 1+types_find<T,P...>::value;
 };
 
@@ -97,8 +100,8 @@ struct types_find<T,T,P...>
   static constexpr int value = 0;
 };
 
-template<typename T, typename U>
-struct types_find<T,U> {static constexpr int value = !std::is_same<T,U>::value;};
+template<typename T>
+struct types_find<T> {static constexpr int value = 0;};
 
 /**
 * Finds the position of the first occurence of C in P.
