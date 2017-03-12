@@ -86,28 +86,42 @@ struct types_extract {
 template<int Start, int Size, typename...P>
 using types_extract_t = typename types_extract<Start,Size,P...>::type;
 
-template<typename T, typename... P>
-struct types_find;
-
-template<typename T, typename U, typename... P>
-struct types_find<T,U,P...> {
-  static constexpr int value = 1+types_find<T,P...>::value;
+template<template<typename...> class Meta, typename... Curry>
+struct types_curry {
+  template<typename T>
+  struct apply_one : public Meta<Curry...,T> {};
+  
+  template<typename... T>
+  struct apply : public Meta<Curry...,T...> {};
 };
 
-template<typename T,typename... P>
-struct types_find<T,T,P...>
-{
-  static constexpr int value = 0;
+template<template<typename> class Test, typename... P>
+struct types_find_if;
+
+template<template<typename> class Test, typename U, typename... P>
+struct types_find_if<Test,U,P...> {
+  template<typename T = U>
+  static constexpr auto test () -> std::enable_if_t<!Test<T>::value,int>
+  { return 1+types_find_if<Test,P...>::value; };
+  
+  template<typename T = U>
+  static constexpr auto test () -> std::enable_if_t<Test<T>::value,int> 
+  { return 0; };
+  
+  static constexpr int value = test<>();
 };
 
-template<typename T>
-struct types_find<T> {static constexpr int value = 0;};
+template<template<typename> class Test>
+struct types_find_if<Test> {static constexpr int value = 0;};
 
 /**
-* Finds the position of the first occurence of C in P.
+* Finds the position of the first occurence of T in P.
 */
 template<typename T, typename... P>
-constexpr int types_find_v = types_find<T,P...>::value;
+constexpr int types_find_v = types_find_if<types_curry<std::is_same,T>::template apply_one,P...>::value;
+
+template<template<typename> class Test, typename... P>
+constexpr int types_find_if_v = types_find_if<Test,P...>::value;
 
 template<template<typename...> class Meta, typename Types>
 using types_apply_t = typename Types::template apply<Meta>;
