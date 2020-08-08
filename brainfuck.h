@@ -16,7 +16,7 @@ struct bf_impl;
 template<char... Prog>
 struct bf
 {
-  using type = types<bf_char<Prog>...>;
+  using type = types_select_t<any_of<bf_char<'+'>,bf_char<'-'>,bf_char<'<'>,bf_char<'>'>,bf_char<'['>,bf_char<']'>,bf_char<'.'>,bf_char<','>>::template apply,bf_char<Prog>...>;
   void run()
   {
     std::array<char,30000> d;
