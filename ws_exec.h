@@ -129,13 +129,13 @@ struct Program {
   
   static void run() {
     Stack s;
-	Heap h;
+    Heap h;
     try {
       types_apply_t<BranchDetector,endflow_block>::run(s,h);
-	  std::cerr << "Improper shutdown of program" << std::endl;
-	} catch(ProgramEnd) {
-	  return;
-	}
+      std::cerr << "Improper shutdown of program" << std::endl;
+    } catch(ProgramEnd) {
+      return;
+    }
   };
   
   ///////////////////////////////////////////
@@ -164,11 +164,11 @@ struct Program {
   
     using front = types_take_t<if_loc,I...>;
     using back = types_drop_t<if_loc,I...>;
-	
+    
     static void run(Stack& s, Heap& h) {
-	  types_apply_t<Exec,front>::run(s,h);
-	  types_apply_t<BranchExec,back>::run(s,h);
-	};
+      types_apply_t<Exec,front>::run(s,h);
+      types_apply_t<BranchExec,back>::run(s,h);
+    };
   };
   
   template<typename Dummy>
@@ -179,12 +179,12 @@ struct Program {
   template<typename Dummy, typename If, typename... I>
   struct BranchExec_impl<Dummy,If,I...> {
     static void run(Stack& s,Heap& h) {
-	  if(If::test(pop(s))) {
-	    run_label<typename If::label>(s,h);
-	  } else {
-	    BranchDetector<I...>::run(s,h);
-	  }
-	};
+      if(If::test(pop(s))) {
+        run_label<typename If::label>(s,h);
+      } else {
+        BranchDetector<I...>::run(s,h);
+      }
+    };
   };
   
   template<typename Dummy>
@@ -195,8 +195,8 @@ struct Program {
   template<typename... I>
   struct Exec {
     static void run(Stack& s, Heap& h) {
-	  (void)std::initializer_list<int>{ (I::template run<Program>(s,h),0)... };
-	};
+      (void)std::initializer_list<int>{ (I::template run<Program>(s,h),0)... };
+    };
   };
 };
 
