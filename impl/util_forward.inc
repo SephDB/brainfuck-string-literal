@@ -24,7 +24,7 @@ struct split;
 
 template<int N, char C>
 constexpr auto find_nth() {
-  return 0;
+  return -1;
 }
 
 template<int N, char C, char A, char... P>
