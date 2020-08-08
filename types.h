@@ -143,6 +143,8 @@ using types_tail_t = typename types_list<Types>::tail;
 
 template<typename... T>
 struct types {
+  static constexpr int size = sizeof...(T);
+
   template<template<typename...> class Meta>
   using apply = Meta<T...>;
   
