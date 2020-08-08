@@ -19,6 +19,9 @@ struct get;
 template<char C, char... P>
 struct num_occurences;
 
+template<int Start, int Size, template<char...> class Meta, char...P>
+struct extract;
+
 template<char Sep, template<char...> class Row, template<typename...>class Field,char... P>
 struct split;
 
