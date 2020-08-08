@@ -80,9 +80,8 @@ struct count_consecutive
 };
 
 template<int N, typename T, typename... Ts>
-struct get
+struct get<N,T,Ts...>
 {
-  static_assert(N <= sizeof...(Ts),"Too large value for N in get");
   using type = typename get<N-1,Ts...>::type;
 };
 
@@ -90,6 +89,12 @@ template<typename T, typename... Ts>
 struct get<0,T,Ts...>
 {
   using type = T;
+};
+
+template<int N>
+struct get<N>
+{
+  using type = void;
 };
 
 template<char C>
@@ -115,13 +120,13 @@ struct split {
     struct taker {
       template<char...Elems>
       struct impl {
-        using type = take_t<row_end<Index>-row_start<Index>,Row,Elems...>;
+        using type = take_t<row_end<Index>-row_start<Index>-1,Row,Elems...>;
       };
       
       using type = typename drop_t<row_start<Index>+1,impl,P...>::type;
     };
     
-    using type = Field<take_t<row_start<0>+1,Row,P...>,typename taker<I>::type...>;
+    using type = Field<take_t<row_start<0>,Row,P...>,typename taker<I>::type...>;
   };
   
   
