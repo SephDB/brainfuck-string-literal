@@ -8,7 +8,7 @@ template<typename...>
 struct parse;
 
 template<typename... T>
-using parse_t = typename parse<T...>::program::template apply<Program>;
+using parse_t = types_apply_t<Program, typename parse<T...>::program>;
 
 template<typename... T> struct parseNum;
 template<typename... T> struct parseLabel;
@@ -88,7 +88,7 @@ struct parseNum<Sign,T...> {
   
   
   using remainder = types_drop_t<len+1,T...>;
-  static constexpr int value = sign*(num::template apply<computeNum>::value);
+  static constexpr int value = sign*(types_apply_t<computeNum,num>::value);
 };
 
 template<typename... T> struct parseLabel {

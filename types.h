@@ -106,6 +106,9 @@ struct types_find<T,U> {static constexpr int value = !std::is_same<T,U>::value;}
 template<typename T, typename... P>
 constexpr int types_find_v = types_find<T,P...>::value;
 
+template<template<typename...> class Meta, typename Types>
+using types_apply_t = typename Types::template apply<Meta>;
+
 template<typename... T>
 struct types {
   template<template<typename...> class Meta>
