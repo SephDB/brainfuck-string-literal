@@ -1,8 +1,7 @@
+#include <type_traits>
+
 template<typename... T>
-struct types {
-  template<template<typename...> class Meta>
-  using apply = Meta<T...>;
-};
+struct types;
 
 template<typename... T>
 struct types_concat;
@@ -21,33 +20,97 @@ struct types_concat<T> {
 };
 
 template<int N, typename... T>
-struct types_take;
-
-template<int N, typename... T>
-using types_take_t = typename types_take<N,T...>::type;
+struct types_split;
 
 template<int N, typename H, typename... T>
-struct types_take<N,H,T...> {
-  using type = types_concat_t<types<H>,types_take_t<N-1,T...>>;
+struct types_split<N,H,T...> {
+  using front = types_concat_t<types<H>,typename types_split<N-1,T...>::front>;
+  using back = typename types_split<N-1,T...>::back;
 };
 
-template<typename H, typename... T>
-struct types_take<0,H,T...> {
-  using type = types<H>;
+template<typename H,typename... T>
+struct types_split<0,H,T...> {
+  using front = types<>;
+  using back = types<H,T...>;
+};
+
+template<>
+struct types_split<0> {
+  using front = types<>;
+  using back = types<>;
 };
 
 template<int N, typename... T>
-struct types_drop;
+using types_take_t = typename types_split<N,T...>::front;
 
 template<int N, typename... T>
-using types_drop_t = typename types_drop<N,T...>::type;
+using types_drop_t = typename types_split<N,T...>::back;
 
-template<int N, typename H, typename... T>
-struct types_drop<N,H,T...> {
-  using type = types_drop_t<N-1,T...>;
+template<template<typename> class Test, typename... T>
+struct types_select {
+  template<typename U, bool B>
+  struct select_test {
+    using type = types<U>;
+  };
+  
+  template<typename U>
+  struct select_test<U,false> {
+    using type = types<>;
+  };
+  
+  using type = types_concat_t<typename select_test<T,Test<T>::value>::type...>;
 };
+
+template<template<typename> class Test, typename... T>
+using types_select_t = typename types_select<Test,T...>::type;
+
+template<int Start, int Size, typename...P>
+struct types_extract {
+  template<typename...Elems>
+    struct impl {
+      using type = types_take_t<Size,Elems...>;
+    };
+    
+    using type = typename types_drop_t<Start+1,P...>::template apply<impl>::type;
+};
+
+template<int Start, int Size, typename...P>
+using types_extract_t = typename types_extract<Start,Size,P...>::type;
+
+template<typename T, typename U, typename... P>
+struct types_find {
+  static constexpr int value = 1+types_find<T,P...>::value;
+};
+
+template<typename T,typename... P>
+struct types_find<T,T,P...>
+{
+  static constexpr int value = 0;
+};
+
+template<typename T, typename U>
+struct types_find<T,U> {static constexpr int value = !std::is_same<T,U>::value;};
+
+/**
+* Finds the position of the first occurence of C in P.
+*/
+template<typename T, typename... P>
+constexpr int types_find_v = types_find<T,P...>::value;
 
 template<typename... T>
-struct types_drop<0,T...> {
-  using type = types<T...>;
+struct types {
+  template<template<typename...> class Meta>
+  using apply = Meta<T...>;
+  
+  template<int N>
+  using drop = types_drop_t<N,T...>;
+  
+  template<int N>
+  using take = types_take_t<N,T...>;
+  
+  template<int Start, int Size>
+  using extract = types_extract_t<Start,Size,T...>;
+  
+  template<typename H>
+  static constexpr bool has_type = any_of<T...>::template apply<H>::value;
 };
