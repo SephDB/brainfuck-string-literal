@@ -168,13 +168,13 @@ namespace {
 }
 
 template<typename Position, typename Movement>
-struct befudge_impl;
+struct befunge_impl;
 
 template<typename Position, typename Movement>
-using set_direction = befudge_impl<typename Movement::template next_pos<Position>,Movement>;
+using set_direction = befunge_impl<typename Movement::template next_pos<Position>,Movement>;
 
 template<typename Position, typename Movement>
-struct befudge_impl {
+struct befunge_impl {
   using internal = impl<Position::value,Position,Movement>;
   
   static void run() {
@@ -367,19 +367,19 @@ struct impl<'~',Pos,Mov> : instr_types::op {
 };
 
 template<char... P>
-struct befudge
+struct befunge
 {
   using instructions = typename program<P...>::instr;
-  void run() {befudge_impl<position<0,0,P...>,move::right>::run();};
+  void run() {befunge_impl<position<0,0,P...>,move::right>::run();};
 };
 
 template<typename CharT, CharT... C> 
-constexpr auto operator"" _befudge()
+constexpr auto operator"" _befunge()
 {
-  return befudge<C...>{};
+  return befunge<C...>{};
 }
 
 int main() {
 R"foo(v
->&:*.19+,)foo"_befudge.run();
+>&:*.19+,)foo"_befunge.run();
 }
