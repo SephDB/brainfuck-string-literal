@@ -7,7 +7,6 @@ template<int N> struct Ref;
 template<int N> struct Slide;
 struct Swap;
 struct Discard;
-template<typename T> struct Infix;
 struct Plus;
 struct Minus;
 struct Times;
