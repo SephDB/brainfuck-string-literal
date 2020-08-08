@@ -1,9 +1,6 @@
 #ifndef _BF_IMPL_H__
 #define _BF_IMPL_H__
 
-template<char... P>
-struct bf_impl;
-
 template<int Depth, int N, char... P>
 struct closing_paren_impl;
 
@@ -13,7 +10,7 @@ struct closing_paren_impl;
 * example: "+-[+[+]>]>+", with P being "+[+]>]>+" will return 5
 */
 template<char... P>
-constexpr int closing_paren = closing_paren_impl<0,0,P...>::value;
+using closing_paren_t = closing_paren_impl<0,0,P...>;
 
 template<int Depth, int N, char H, char... T>
 struct closing_paren_impl<Depth,N,H,T...>
