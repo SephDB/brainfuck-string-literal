@@ -126,6 +126,21 @@ constexpr int types_find_if_v = types_find_if<Test,P...>::value;
 template<template<typename...> class Meta, typename Types>
 using types_apply_t = typename Types::template apply<Meta>;
 
+template<typename Types>
+struct types_list;
+
+template<typename H, typename... T>
+struct types_list<types<H,T...>> {
+  using head = H;
+  using tail = types<T...>;
+};
+
+template<typename Types>
+using types_head_t = typename types_list<Types>::head;
+
+template<typename Types>
+using types_tail_t = typename types_list<Types>::tail;
+
 template<typename... T>
 struct types {
   template<template<typename...> class Meta>
