@@ -36,7 +36,7 @@ template<char C, char... P>
 struct bf_impl<C, P...>
 {
   static void run() {
-  	static_assert(!C,"Invalid character found");
+  	bf_impl<P...>::run();
   }
 };
 
