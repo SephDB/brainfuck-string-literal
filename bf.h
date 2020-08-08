@@ -47,7 +47,7 @@ struct bf_impl<'[',P...>
   
   static void run() {
     while(*ptr) take_t<loop_size,bf_impl,P...>::run();
-    discard_t<loop_size+1,bf_impl,P...>::run();
+    drop_t<loop_size+1,bf_impl,P...>::run();
   }
 };
 

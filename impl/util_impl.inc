@@ -27,10 +27,10 @@ struct take
 };
 
 template<int N, template<char...P> class Meta, char H, char... P>
-struct discard<N,true,Meta,H,P...> {using type = typename discard<N-1,(N-1>0), Meta, P...>::type;};
+struct drop<N,true,Meta,H,P...> {using type = typename drop<N-1,(N-1>0), Meta, P...>::type;};
 
 template<template<char...P> class Meta, char... P>
-struct discard<0,false,Meta,P...> {using type = Meta<P...>;};
+struct drop<0,false,Meta,P...> {using type = Meta<P...>;};
 
 template<char C, template<char...> class Meta, char... P>
 struct count_consecutive

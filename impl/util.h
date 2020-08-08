@@ -19,7 +19,7 @@ using take_t = typename take<N,Meta,P...>::type;
 * Discards N arguments from variadic char list and applies remainder to Meta
 */
 template<int N, template<char...> class Meta, char... P>
-using discard_t = typename discard<N,(N>0),Meta,P...>::type;
+using drop_t = typename drop<N,(N>0),Meta,P...>::type;
 
 /**
 * Counts the number of consecutive instances of C at the start of P as std::size_t ::size, and applies the remaining elements to Meta in Meta<...> ::remainder
