@@ -180,11 +180,33 @@ struct befudge_impl {
 	befudge_impl<typename Movement::template next_pos<Position>,Movement>::run();
   };
   
+  static void run_impl(instr_types::branch) {
+    bool b = s.back() != 0;
+	s.pop_back();
+	if(b) {
+	  befudge_impl<typename internal::true_branch::template next_pos<Position>,typename internal::true_branch>::run();
+	} else {
+	  befudge_impl<typename internal::false_branch::template next_pos<Position>,typename internal::false_branch>::run();
+	}
+  }
+  
   static void run_impl(instr_types::set_movement) {
     using new_movement = typename internal::movement;
 	befudge_impl<typename new_movement::template next_pos<Position>,new_movement>::run();
   };
   
+};
+
+template<typename Pos, typename Mov>
+struct impl<'|',Pos,Mov> : instr_types::branch {
+  using true_branch = move::up;
+  using false_branch = move::down;
+};
+
+template<typename Pos, typename Mov>
+struct impl<'_',Pos,Mov> : instr_types::branch {
+  using true_branch = move::left;
+  using false_branch = move::right;
 };
 
 template<typename Pos, typename Mov>
