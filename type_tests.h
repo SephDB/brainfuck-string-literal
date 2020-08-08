@@ -1,3 +1,6 @@
+#ifndef __TYPE_TESTS_H__
+#define __TYPE_TESTS_H__
+
 #include <type_traits>
 
 template<typename... T>
@@ -16,3 +19,5 @@ struct any_of<> {
   template<typename U>
   struct apply : std::false_type {};
 };
+
+#endif

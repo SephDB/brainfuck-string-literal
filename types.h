@@ -1,4 +1,8 @@
+#ifndef __TYPES_H__
+#define __TYPES_H__
+
 #include <type_traits>
+#include "type_tests.h"
 
 template<typename... T>
 struct types;
@@ -119,3 +123,5 @@ struct types {
   template<typename H>
   static constexpr bool has_type = any_of<T...>::template apply<H>::value;
 };
+
+#endif
